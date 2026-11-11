@@ -1,0 +1,17 @@
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+
+# Загружаем встроенный набор данных с рукописными цифрами
+digits = load_digits()
+
+# Создаем сетку из 5 графиков в один ряд
+fig, axes = plt.subplots(1, 5, figsize=(10, 3))
+
+# Выводим первые 5 примеров
+for i in range(5):
+  axes[i].imshow(digits.images[i], cmap="gray_r")
+  axes[i].set_title(f"Цифра: {digits.target[i]}")
+  axes[i].axis("off")
+
+plt.tight_layout()
+plt.show()
