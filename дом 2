@@ -1,0 +1,52 @@
+# Устанавливаем библиотеку прямо из ячейки блокнота
+!pip install -q natasha
+
+from natasha import (
+    Doc,
+    MorphVocab,
+    NewsEmbedding,
+    NewsMorphTagger,
+    NewsNERTagger,
+    Segmenter,
+)
+
+# Инициализируем компоненты библиотеки Natasha
+segmenter = Segmenter()
+morph_vocab = MorphVocab()
+emb = NewsEmbedding()
+morph_tagger = NewsMorphTagger(emb)
+ner_tagger = NewsNERTagger(emb)
+
+
+def extract_fio(text):
+  doc = Doc(text)
+  doc.segment(segmenter)
+  doc.tag_morph(morph_tagger)
+  doc.tag_ner(ner_tagger)
+
+  found_names = []
+
+  for span in doc.spans:
+    if span.type == "PER":
+      span.normalize(morph_vocab)
+      found_names.append(span.normal)
+
+  return found_names
+
+
+# Пример текста из документа
+sample_document = """
+ДОГОВОР ОКАЗАНИЯ УСЛУГ № 145
+г. Москва «12» октября 2026 г.
+
+Гражданин Иванов Иван Иванович, именуемый в дальнейшем «Заказчик», 
+с одной стороны, и Смирнова Елена Сергеевна, именуемая в дальнейшем «Исполнитель», 
+заключили настоящий договор. Ответственным за приемку назначен Петров А.В.
+"""
+
+results = extract_fio(sample_document)
+
+print("Найденные ФИО в документе:")
+for fio in results:
+  print("-", fio)
+
